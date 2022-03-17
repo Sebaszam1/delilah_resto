@@ -1,5 +1,5 @@
 {
-  "name": "delilah",
+  "name": "delilah-resto",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -10,7 +10,7 @@
     "test": "./node_modules/.bin/mocha",
     "start": "nodemon app.js"
   },
-  "author": "Daniel Betancur Rodríguez",
+  "author": "Sebastian Zambrano Sotto",
   "license": "ISC",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
