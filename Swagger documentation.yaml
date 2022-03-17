@@ -1,0 +1,661 @@
+swagger: "2.0"
+
+info:
+  description: "Online ordering system for restaurant"
+  version: "1.0"
+  title: "Delilah Restó"
+  contact:
+    email: "sebaszam1@outlook.com"
+
+host: "localhost:3000"
+basePath: "/v1"
+tags:
+  - name: "Auth"
+    description: "Login and register without token"
+    externalDocs:
+      description: "URL"
+      url: "http://localhost:3000/v1/auth"
+  - name: "Users"
+    description: "CRUD Users"
+    externalDocs:
+      description: "URL"
+      url: "http://localhost:3000/v1/users"
+
+  - name: "Meals"
+    description: "CRUD Meals"
+    externalDocs:
+      description: "URL"
+      url: "http://localhost:3000/v1/meals"
+
+  - name: "Orders"
+    description: "CRUD Orders"
+    externalDocs:
+      description: "URL"
+      url: "http://localhost:3000/v1/orders"
+schemes:
+  - "https"
+  - "http"
+paths:
+  /auth/register:
+    post:
+      tags:
+        - "Auth"
+      summary: "Create a new user without token"
+      description: ""
+      operationId: "New user"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Object user to create an user"
+          required: true
+          schema:
+            $ref: "#/definitions/usersRegister"
+      responses:
+        "201":
+          description: "User created"
+        "400":
+          description: "User already exists"
+        "500":
+          description: "Unexpected error"
+
+  /auth/login:
+    post:
+      tags:
+        - "Auth"
+      summary: "Login"
+      description: ""
+      operationId: "Identify user"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Object to login"
+          required: true
+          schema:
+            $ref: "#/definitions/usersLogin"
+      responses:
+        "200":
+          description: "User verified"
+        "400":
+          description: "Invalid username and/or password"
+        "500":
+          description: "Unexpected error"
+
+  /users:
+    get:
+      tags:
+        - "Users"
+      summary: "Get all users"
+      description: ""
+      operationId: ""
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Operation done"
+          schema:
+            $ref: "#/definitions/users"
+        "404":
+          description: "Users not found"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+    post:
+      tags:
+        - "Users"
+      summary: "Create a new user"
+      description: ""
+      operationId: "NuevoUsuario"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Object 'user' to create a new user"
+          required: true
+          schema:
+            $ref: "#/definitions/usersRegister"
+      responses:
+        "201":
+          description: "User created"
+          schema:
+            type: "object"
+            items:
+              $ref: "#/definitions/users"
+        "400":
+          description: "User already exists"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+  /users/{id_user}:
+    get:
+      tags:
+        - "Users"
+      summary: "Search a user by ID"
+      description: "Return a user"
+      operationId: ""
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "id_user"
+          in: "path"
+          description: "Identify the user ID"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Operation done"
+          schema:
+            $ref: "#/definitions/users"
+        "404":
+          description: "Users not found"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+    put:
+      tags:
+        - "Users"
+      summary: "Update user role"
+      description: ""
+      operationId: ""
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "id_user"
+          in: "path"
+          description: "ID of user to return"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "204":
+          description: "Updated user"
+          schema:
+            $ref: "#/definitions/roleUser"
+        "400":
+          description: "Update failed"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+    delete:
+      tags:
+        - "Users"
+      summary: "Delete a user"
+      description: ""
+      operationId: "eliminarUsuario"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "id_user"
+          in: "path"
+          description: "Delete identified user"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "204":
+          description: "User Deleted"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+  /meals:
+    post:
+      tags:
+        - "Meals"
+      summary: "Create a new meal"
+      description: ""
+      operationId: "NuevoPlato"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Object 'user' to create a new meal"
+          required: true
+          schema:
+            $ref: "#/definitions/meals"
+      responses:
+        "201":
+          description: "Meal created"
+          schema:
+            type: "object"
+            items:
+              $ref: "#/definitions/meals"
+        "400":
+          description: "Creation error"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+    get:
+      tags:
+        - "Meals"
+      summary: "Get all meals"
+      description: ""
+      operationId: ""
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Operation done"
+          schema:
+            type: "object"
+            items:
+              $ref: "#/definitions/meals"
+        "404":
+          description: "Search failed"
+        "500":
+          description: "Unexpected error"
+
+  /meals/{id_meal}:
+    get:
+      tags:
+        - "Meals"
+      summary: "Search a meal by ID"
+      description: ""
+      operationId: ""
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id_meal"
+          in: "path"
+          description: "Get a meal by its ID"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "200":
+          description: "Operation done"
+          schema:
+            $ref: "#/definitions/meals"
+        "404":
+          description: "Search failed"
+        "500":
+          description: "Unexpected error"
+    put:
+      tags:
+        - "Meals"
+      summary: "Modify the food plate"
+      description: ""
+      operationId: ""
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "id_meal"
+          in: "path"
+          description: ""
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "204":
+          description: "Meal updated"
+          schema:
+            $ref: "#/definitions/meals"
+        "400":
+          description: "Update failed"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+    delete:
+      tags:
+        - "Meals"
+      summary: "Delete a meal"
+      description: ""
+      operationId: ""
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "id_meal"
+          in: "path"
+          description: "Delete meal"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "204":
+          description: "Meal removed"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+  /orders:
+    get:
+      tags:
+        - "Orders"
+      summary: "Get all orders"
+      description: ""
+      operationId: ""
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Operation done"
+          schema:
+            $ref: "#/definitions/orders"
+        "404":
+          description: "Users not found"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+    post:
+      tags:
+        - "Orders"
+      summary: "Create a new order"
+      description: ""
+      operationId: ""
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Object to create a new order"
+          required: true
+          schema:
+            $ref: "#/definitions/orders"
+      responses:
+        "201":
+          description: "Order created"
+          schema:
+            type: "object"
+            items:
+              $ref: "#/definitions/orders"
+        "400":
+          description: "Creation error"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+  /orders/{id_order}:
+    put:
+      tags:
+        - "Orders"
+      summary: "Update order status"
+      description: ""
+      operationId: ""
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "id_order"
+          in: "path"
+          description: ""
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "204":
+          description: "Update failed"
+          schema:
+            $ref: "#/definitions/statusOrder"
+        "400":
+          description: "error en la actualización"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+    delete:
+      tags:
+        - "Orders"
+      summary: "Delete an order"
+      description: ""
+      operationId: ""
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+        - name: "id_order"
+          in: "path"
+          description: "Delete order"
+          required: true
+          type: "integer"
+          format: "int64"
+      responses:
+        "204":
+          description: "Order removed"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "write:delilah"
+            - "read:delilah"
+
+  /orders/user:
+    get:
+      tags:
+        - "Orders"
+      summary: "Get all orders from my user"
+      description: ""
+      operationId: ""
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Authorization"
+          in: "header"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Operation done"
+          schema:
+            $ref: "#/definitions/orders"
+        "404":
+          description: "Orders not found"
+        "500":
+          description: "Unexpected error"
+      security:
+        - routes_auth:
+            - "read:delilah"
+
+definitions:
+  usersRegister:
+    type: "object"
+    properties:
+      id_user:
+        type: "integer"
+        format: "int64"
+      nombre_user:
+        type: "string"
+      email:
+        type: "string"
+      contrasena:
+        type: "string"
+      phone:
+        type: "string"
+      address:
+        type: "string"
+      id_role:
+        type: "integer"
+        format: "int32"
+
+  usersLogin:
+    type: "object"
+    properties:
+      email:
+        type: "string"
+      contrasena:
+        type: "string"
+
+  users:
+    type: "object"
+    properties:
+      id_user:
+        type: "integer"
+        format: "int64"
+      nombre_user:
+        type: "string"
+      email:
+        type: "string"
+      contrasena:
+        type: "string"
+      phone:
+        type: "string"
+      address:
+        type: "string"
+      id_role:
+        type: "integer"
+        format: "int32"
+
+  meals:
+    type: "object"
+    properties:
+      id_meal:
+        type: "integer"
+        format: "int32"
+      nombre_meal:
+        type: "string"
+      precio:
+        type: "integer"
+        format: "int32"
+      img:
+        type: "string"
+
+  orders:
+    type: "object"
+    properties:
+      id_order:
+        type: "integer"
+        format: "int32"
+      hora:
+        type: "string"
+      nombre_meal:
+        type: "string"
+      nombre_forma_pago:
+        type: "string"
+      nombre_user:
+        type: "string"
+      address:
+        type: "string"
+      email:
+        type: "string"
+      nombre_status:
+        type: "string"
+
+  statusOrder:
+    type: "object"
+    properties:
+      id_status:
+        type: "integer"
+        format: "int32"
+
+  roleUser:
+    type: "object"
+    properties:
+      id_role:
+        type: "integer"
+        format: "int32"
+
+securityDefinitions:
+  routes_auth:
+    type: "oauth2"
+    authorizationUrl: "http://localhost:3000/v1"
+    flow: "implicit"
+    scopes:
+      write:delilah: "Modify elements"
+      read:delilah: "Read elements"
